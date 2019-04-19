@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 
+import info.nightscout.androidaps.bus.RxBus;
 import info.nightscout.androidaps.data.ConstraintChecker;
 import info.nightscout.androidaps.db.DatabaseHelper;
 import info.nightscout.androidaps.interfaces.PluginBase;
@@ -94,6 +95,7 @@ public class MainApp extends Application {
     private static KeepAliveReceiver keepAliveReceiver;
 
     private static Bus sBus;
+    private static RxBus sRxBus;
     private static MainApp sInstance;
     public static Resources sResources;
 
@@ -145,6 +147,7 @@ public class MainApp extends Application {
         devBranch = BuildConfig.VERSION.contains("dev");
 
         sBus = L.isEnabled(L.EVENTS) && devBranch ? new LoggingBus(ThreadEnforcer.ANY) : new Bus(ThreadEnforcer.ANY);
+        sRxBus = new RxBus();
 
         registerLocalBroadcastReceiver();
 
@@ -277,6 +280,10 @@ public class MainApp extends Application {
 
     public static Bus bus() {
         return sBus;
+    }
+
+    public static RxBus rxBus() {
+        return sRxBus;
     }
 
     public static String gs(int id) {
