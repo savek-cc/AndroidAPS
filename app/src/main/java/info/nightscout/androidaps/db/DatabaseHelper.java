@@ -83,7 +83,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_INSIGHT_BOLUS_IDS = "InsightBolusIDs";
     public static final String DATABASE_INSIGHT_PUMP_IDS = "InsightPumpIDs";
 
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     public static Long earliestDataChange = null;
 
@@ -151,14 +151,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
                 log.debug("Upgrading database from v7 to v8");
             } else if (oldVersion == 8 && newVersion == 9) {
                 log.debug("Upgrading database from v8 to v9");
-            } else if (oldVersion == 9 && newVersion == 10) {
+            } else if (oldVersion < 11 && newVersion > 11) {
                 TableUtils.createTableIfNotExists(connectionSource, InsightHistoryOffset.class);
                 TableUtils.createTableIfNotExists(connectionSource, InsightBolusID.class);
                 TableUtils.createTableIfNotExists(connectionSource, InsightPumpID.class);
-                database.execSQL("INSERT INTO sqlite_sequence (name, seq) SELECT \"" + DATABASE_INSIGHT_BOLUS_IDS + "\", " + System.currentTimeMillis() + " " +
-                        "WHERE NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = \"" + DATABASE_INSIGHT_BOLUS_IDS + "\")");
-                database.execSQL("INSERT INTO sqlite_sequence (name, seq) SELECT \"" + DATABASE_INSIGHT_PUMP_IDS + "\", " + System.currentTimeMillis() + " " +
-                        "WHERE NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = \"" + DATABASE_INSIGHT_PUMP_IDS + "\")");
+                database.execSQL("INSERT INTO sqlite_sequence (name, seq) SELECT \"" + DATABASE_INSIGHT_BOLUS_IDS + "\", " + System.currentTimeMillis());
+                database.execSQL("INSERT INTO sqlite_sequence (name, seq) SELECT \"" + DATABASE_INSIGHT_PUMP_IDS + "\", " + System.currentTimeMillis());
             } else {
                 log.info(DatabaseHelper.class.getName(), "onUpgrade");
                 TableUtils.dropTable(connectionSource, TempTarget.class, true);
@@ -169,6 +167,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
                 TableUtils.dropTable(connectionSource, ExtendedBolus.class, true);
                 TableUtils.dropTable(connectionSource, CareportalEvent.class, true);
                 TableUtils.dropTable(connectionSource, ProfileSwitch.class, true);
+                TableUtils.dropTable(connectionSource, InsightBolusID.class, true);
+                TableUtils.dropTable(connectionSource, InsightPumpID.class, true);
+                TableUtils.dropTable(connectionSource, InsightHistoryOffset.class, true);
                 onCreate(database, connectionSource);
             }
         } catch (SQLException e) {
