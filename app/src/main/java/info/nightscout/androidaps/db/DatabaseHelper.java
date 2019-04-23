@@ -151,7 +151,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
                 log.debug("Upgrading database from v7 to v8");
             } else if (oldVersion == 8 && newVersion == 9) {
                 log.debug("Upgrading database from v8 to v9");
-            } else if (oldVersion < 11 && newVersion > 11) {
+            } else if (oldVersion < 11 && newVersion >= 11) {
                 TableUtils.createTableIfNotExists(connectionSource, InsightHistoryOffset.class);
                 TableUtils.createTableIfNotExists(connectionSource, InsightBolusID.class);
                 TableUtils.createTableIfNotExists(connectionSource, InsightPumpID.class);
